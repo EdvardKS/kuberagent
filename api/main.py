@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI 
+from services.vector_store import vector_store
 from services.client import picasso
 from pydantic import BaseModel
 import uvicorn
@@ -18,14 +18,7 @@ class ChatRequest(BaseModel):
 
 @app.get("/")
 async def health():
-    return {"status": "ok"}
-
-# @app.post("/chat/stream")
-# async def chat_stream(req: ChatRequest):
-#     async def generator():
-#         async for chunk in picasso.chat_stream(req.input):
-#             yield chunk
-#     return StreamingResponse(generator(), media_type="text/plain")
+    return {"status": "ok"} 
 
 @app.post("/chat", response_class=PlainTextResponse)
 async def chat(req: ChatRequest):
@@ -41,6 +34,16 @@ async def chat(req: ChatRequest):
 
     return result
 
+@app.post("/ingest")
+async def ingest(req: ChatRequest):
+    doc = req.input
+
+    emb = await picasso.embed(doc)
+
+    vector_store.add(emb, doc)
+    vector_store.save()  
+
+    return {"status": "ok", "doc": doc[:50]}
 
 if __name__ == "__main__":
     uvicorn.run(

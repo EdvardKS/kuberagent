@@ -1,20 +1,37 @@
 from services.client import picasso
+from services.vector_store import vector_store
 from graph.state import GraphState
 
 
 # 🔹 Router
 async def router_node(state: GraphState) -> GraphState:
-    text = state["input"].lower()
+    return {**state, "task": "rag"}  # forzamos RAG ahora
 
-    if "imagen" in text or "ocr" in text:
-        task = "vision"
-    elif "embedding" in text:
-        task = "embed"
-    else:
-        task = "chat"
 
-    return {**state, "task": task}
+# 🔹 RAG node
+async def rag_node(state: GraphState) -> GraphState:
+    query = state["input"]
 
+    query_embedding = await picasso.embed(query)
+
+    docs = vector_store.search(query_embedding)
+
+    context = "\n".join(docs)
+
+    prompt = f"""
+Responde usando SOLO el contexto.
+Si no está, di "No lo sé".
+
+Contexto:
+{context}
+
+Pregunta:
+{query}
+"""
+
+    result = await picasso.chat(prompt)
+
+    return {**state, "response": result}
 
 # 🔹 Chat
 async def chat_node(state: GraphState) -> GraphState:
