@@ -41,7 +41,6 @@ async def ingest(req: ChatRequest):
     emb = await picasso.embed(doc)
 
     vector_store.add(emb, doc)
-    vector_store.save()  
 
     return {"status": "ok", "doc": doc[:50]}
 

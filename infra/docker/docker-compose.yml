@@ -10,7 +10,7 @@ services:
     volumes:
       - ../../output:/app/output
     environment:
-      - PICASSO=http://host.docker.internal:11434
+      - PICASSO=http://192.168.200.134:12346
       - VECTOR_DB_URL=http://qdrant:6333
     depends_on:
       - qdrant
@@ -24,7 +24,7 @@ services:
     volumes:
       - ../../output:/app/output
     environment:
-      - PICASSO=http://host.docker.internal:11434
+      - PICASSO=http://192.168.200.134:12346
       - VECTOR_DB_URL=http://qdrant:6333
     depends_on:
       - qdrant
