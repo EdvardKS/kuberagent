@@ -81,7 +81,7 @@ class VectorStore:
         )
 
         return [
-            point.payload.get("text", "")
+            point.payload.get("text", "") # type: ignore
             for point in results.points
         ]
 
