@@ -74,7 +74,7 @@ class VectorStore:
                 }  # type: ignore
             ],
         )
-
+ 
 
     def search(self, embedding, k=3):
         vec = self._normalize(embedding)
