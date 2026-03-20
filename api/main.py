@@ -1,12 +1,15 @@
-from fastapi import FastAPI 
-from services.vector_store import vector_store
-from services.client import picasso
-from pydantic import BaseModel
+import redis 
 import uvicorn
+from fastapi import FastAPI 
+from pydantic import BaseModel
 from graph.graph import build_graph
+from services.client import picasso
+from config.settings import REDIS_URL, Colors
+from services.vector_store import vector_store
 from fastapi.responses import PlainTextResponse
-from config.settings import Colors
+ 
 
+r = redis.Redis.from_url(REDIS_URL)
 app = FastAPI(title="LangGraph API")
 
 graph = build_graph()
@@ -36,13 +39,14 @@ async def chat(req: ChatRequest):
 
 @app.post("/ingest")
 async def ingest(req: ChatRequest):
-    doc = req.input
+    job = {
+        "type": "ingest",
+        "text": req.input
+    }
 
-    emb = await picasso.embed(doc)
+    r.xadd("jobs", job)
 
-    vector_store.add(emb, doc)
-
-    return {"status": "ok", "doc": doc[:50]}
+    return {"status": "queued"}
 
 if __name__ == "__main__":
     uvicorn.run(

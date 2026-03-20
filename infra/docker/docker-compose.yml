@@ -1,17 +1,22 @@
+
 services:
 
   api:
     build:
       context: ../../
-    container_name: kuberagent-api
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    container_name: api
+    command: uvicorn api.main:app --host 0.0.0.0 --port ${API_PORT}
     ports:
-      - "8000:8000"
+      - "${API_PORT}:${API_PORT}"
     volumes:
       - ../../output:/app/output
     environment:
-      - PICASSO=http://192.168.200.134:12346
-      - VECTOR_DB_URL=http://qdrant:6333
+      - PICASSO=${PICASSO}
+      - CHAT_MODEL=${CHAT_MODEL}
+      - EMBED_MODEL=${EMBED_MODEL}
+      - VISION_MODEL=${VISION_MODEL}
+      - VECTOR_DB_URL=${VECTOR_DB_URL}
+      - REDIS_URL=${REDIS_URL}
     depends_on:
       - qdrant
       - redis
@@ -19,31 +24,36 @@ services:
   worker:
     build:
       context: ../../
-    container_name: kuberagent-worker
+    container_name: worker
     command: python workers/worker.py
-    volumes:
-      - ../../output:/app/output
     environment:
-      - PICASSO=http://192.168.200.134:12346
-      - VECTOR_DB_URL=http://qdrant:6333
+      - VECTOR_DB_URL=${VECTOR_DB_URL}
+      - REDIS_URL=${REDIS_URL}
+      - CHAT_MODEL=${CHAT_MODEL}
+      - EMBED_MODEL=${EMBED_MODEL}
+      - VISION_MODEL=${VISION_MODEL}
     depends_on:
-      - qdrant
       - redis
+      - qdrant
 
   redis:
     image: redis:7
-    container_name: kuberagent-redis
+    container_name: redis
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
 
   qdrant:
     image: qdrant/qdrant:latest
-    container_name: kuberagent-qdrant
+    container_name: qdrant
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - "${QDRANT_PORT}:6333"
+      - "${QDRANT_GRPC_PORT}:6334"
     volumes:
       - qdrant_data:/qdrant/storage
 
 volumes:
   qdrant_data:
+  redis_data:

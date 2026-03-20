@@ -1,11 +1,12 @@
 import os
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
+from config.settings import PICASSO_URL, CHAT_MODEL, EMBED_MODEL, VISION_MODEL, REDIS_URL, VECTOR_DB_URL
 
 
 class VectorStore:
     def __init__(self):
-        self.url = os.getenv("VECTOR_DB_URL", "http://localhost:6333")
+        self.url = VECTOR_DB_URL
         self.collection = "documents"
 
         self.client = QdrantClient(url=self.url)

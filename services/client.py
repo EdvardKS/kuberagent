@@ -1,6 +1,6 @@
 import httpx
 import asyncio
-from config.settings import PICASSO_URL, CHAT_MODEL, EMBED_MODEL, VISION_MODEL
+from config.settings import PICASSO_URL, CHAT_MODEL, EMBED_MODEL, VISION_MODEL, REDIS_URL, VECTOR_DB_URL
 import json
 
 

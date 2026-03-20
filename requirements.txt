@@ -6,3 +6,4 @@ langgraph
 pydantic
 faiss-cpu
 qdrant-client
+redis
