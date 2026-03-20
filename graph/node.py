@@ -18,9 +18,9 @@ async def normalize_node(state: GraphState) -> GraphState:
         embedding = embedding.get("embedding", [])
 
     # Normalización L2
-    norm = sum(x ** 2 for x in embedding) ** 0.5
+    norm = sum(x ** 2 for x in embedding) ** 0.5 # type: ignore
     if norm > 0:
-        embedding = [x / norm for x in embedding]
+        embedding = [x / norm for x in embedding] # type: ignore
 
     return {**state, "query_embedding": embedding}
 
@@ -88,7 +88,7 @@ Respuesta detallada:"""
 
 # ── 6. Call LLM ─────────────────────────────────────────────────────────────
 async def call_llm_node(state: GraphState) -> GraphState:
-    result = await picasso.chat(state["prompt"])
+    result = await picasso.chat(state["prompt"]) # type: ignore
     return {**state, "response": result, "attempts": state.get("attempts", 0) + 1}
 
 

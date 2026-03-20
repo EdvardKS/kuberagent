@@ -13,8 +13,9 @@ from graph.node import (
 
 
 def build_graph():
+    # Creamos una instancia del grafo de estados, especificando la clase que representará el estado del grafo.
     builder = StateGraph(GraphState)
-
+    # Añadimos los nodos al grafo, cada nodo representa una función que se ejecutará en el proceso de búsqueda y generación de respuestas.
     builder.add_node("embed_query", embed_query_node)
     builder.add_node("normalize", normalize_node)
     builder.add_node("search", search_node)
@@ -22,7 +23,7 @@ def build_graph():
     builder.add_node("build_prompt", build_prompt_node)
     builder.add_node("call_llm", call_llm_node)
     builder.add_node("evaluate", evaluate_node)
-
+    # Definimos el punto de entrada del grafo y las conexiones entre los nodos, estableciendo el flujo de ejecución del proceso.
     builder.set_entry_point("embed_query")
     builder.add_edge("embed_query", "normalize")
     builder.add_edge("normalize", "search")
@@ -30,7 +31,8 @@ def build_graph():
     builder.add_edge("chunk_docs", "build_prompt")
     builder.add_edge("build_prompt", "call_llm")
     builder.add_edge("call_llm", "evaluate")
-
+    # Añadimos una conexión condicional desde el nodo de evaluación, 
+    # que determina si se debe finalizar el proceso o si se debe volver a construir el prompt para intentar obtener una mejor respuesta.
     builder.add_conditional_edges(
         "evaluate",
         should_retry,
@@ -39,5 +41,5 @@ def build_graph():
             "retry": "build_prompt",
         },
     )
-
+    # Finalmente, compilamos el grafo para que esté listo para su ejecución.
     return builder.compile()
