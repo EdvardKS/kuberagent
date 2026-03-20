@@ -1,7 +1,14 @@
 import os
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance
-from config.settings import PICASSO_URL, CHAT_MODEL, EMBED_MODEL, VISION_MODEL, REDIS_URL, VECTOR_DB_URL
+from config.settings import (
+    PICASSO_URL,
+    CHAT_MODEL,
+    EMBED_MODEL,
+    VISION_MODEL,
+    REDIS_URL,
+    VECTOR_DB_URL,
+)
 
 
 class VectorStore:
@@ -72,19 +79,20 @@ class VectorStore:
     def search(self, embedding, k=3):
         vec = self._normalize(embedding)
 
-        if not self._initialized:
-            return []
-
         results = self.client.query_points(
             collection_name=self.collection,
             query=vec,
             limit=k,
         )
 
-        return [
-            point.payload.get("text", "") # type: ignore
-            for point in results.points
-        ]
+        print("RESULTS RAW:", results)
 
+        texts = [point.payload.get("text", "") for point in results.points]
+
+        print("TEXTS:", texts)
+
+        return texts
+    
+ 
 
 vector_store = VectorStore()

@@ -31,11 +31,9 @@ async def chat(req: ChatRequest):
         "response": ""
     })
 
-    colored = f"{Colors.BLUE}{result['response']}{Colors.RESET}"
+    colored = f"\n{Colors.BLUE}{result['response']}{Colors.RESET}\n"
     print(colored)
     return colored
-
-    return result
 
 @app.post("/ingest")
 async def ingest(req: ChatRequest):

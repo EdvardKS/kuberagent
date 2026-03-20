@@ -5,3 +5,4 @@ class GraphState(TypedDict):
     input: str
     task: Optional[str]
     response: str
+   
